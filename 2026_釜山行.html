@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>2026 釜山行｜旅遊行動版</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#18212f;--muted:#667085;--line:#e5e7eb;--accent:#111827;--soft:#eef2f7;--ok:#147d5a}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}
+button,select,input{font:inherit} button{cursor:pointer}
+.wrap{max-width:760px;margin:auto;padding:14px 14px 90px}
+.hero{background:linear-gradient(135deg,#111827,#374151);color:#fff;border-radius:24px;padding:22px 20px;margin-bottom:12px}
+.hero h1{font-size:25px;margin:0 0 6px}.hero p{margin:0;color:#dbe2ea;font-size:14px}.count{margin-top:16px;display:inline-block;background:rgba(255,255,255,.12);padding:8px 11px;border-radius:12px;font-size:13px}
+.nav{position:sticky;top:0;z-index:5;background:rgba(245,247,251,.94);backdrop-filter:blur(10px);padding:8px 0}
+.navgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.nav button{border:1px solid var(--line);background:#fff;border-radius:13px;min-height:44px;color:var(--muted);font-size:13px}
+.nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+section{display:none}.section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0}
+.card h2{font-size:18px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px}
+.day-tabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.day-tabs button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 13px}.day-tabs button.active{background:#111827;color:#fff}
+.timeline{position:relative;margin-top:12px}.item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}.dot{width:9px;height:9px;background:#111827;border-radius:50%;margin-top:6px;flex:0 0 auto}.item strong{display:block;font-size:15px;line-height:1.45}.item small{color:var(--muted)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:9px}.info .box{background:var(--soft);border-radius:14px;padding:12px}.box b{display:block;font-size:13px;margin-bottom:5px}.box span{font-size:14px}
+.flight{display:grid;grid-template-columns:74px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.flight:last-child{border:0}.badge{background:var(--soft);border-radius:12px;padding:10px 7px;text-align:center;font-size:12px;font-weight:700}.flight b{font-size:16px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filters select,.filters input{width:100%;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.spot{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}.spot:last-child{border:0}.spot input{width:22px;height:22px;margin-top:1px}.spot-main{min-width:0;flex:1}.spot-name{font-weight:700}.tag{display:inline-block;font-size:11px;background:var(--soft);padding:4px 7px;border-radius:8px;margin:5px 5px 0 0;color:#475467}.done{text-decoration:line-through;color:#98a2b3}
+.tip{font-size:13px;color:var(--muted);line-height:1.55}
+@media(max-width:380px){.info{grid-template-columns:1fr}.nav button{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>🇰🇷 2026 釜山行</h1>
+<p>10/08（四）～ 10/12（一）｜手機旅遊行動版</p>
+<div class="count" id="countdown">準備出發中…</div>
+</div>
+
+<div class="nav"><div class="navgrid">
+<button data-tab="today" class="active">📍 行程</button>
+<button data-tab="spots">⭐ 踩點</button>
+<button data-tab="trip">✈️ 旅程</button>
+<button data-tab="notes">📝 提醒</button>
+</div></div>
+
+<section id="today" class="section active">
+<div class="card">
+<h2>每日行程</h2>
+<div class="day-tabs" id="dayTabs"></div>
+<div id="dayContent"></div>
+</div>
+</section>
+
+<section id="spots" class="section">
+<div class="card">
+<h2>踩點清單</h2>
+<div class="filters">
+<select id="areaFilter"><option value="">全部地區</option></select>
+<select id="catFilter"><option value="">全部類別</option></select>
+</div>
+<input id="spotSearch" placeholder="搜尋店名／備註…" style="width:100%;margin-top:8px;padding:11px;border:1px solid var(--line);border-radius:12px">
+<div id="spotList"></div>
+</div>
+</section>
+
+<section id="trip" class="section">
+<div class="card"><h2>✈️ 航班</h2><div id="flights"></div></div>
+<div class="card"><h2>🏠 住宿</h2><div class="info">
+<div class="box"><b>住宿</b><span id="hotelName"></span></div>
+<div class="box"><b>期間</b><span id="hotelPeriod"></span></div>
+<div class="box"><b>鄰近交通</b><span id="hotelStation"></span></div>
+</div></div>
+</section>
+
+<section id="notes" class="section">
+<div class="card"><h2>📌 行前資訊</h2>
+<p class="tip">旅遊日期：10/08～10/12</p>
+<p class="tip">E-sim：已完成｜金額 426</p>
+<p class="tip">旅平險：已完成</p>
+<p class="tip">入境資料：尚未完成</p>
+<p class="tip">住宿：플로트하우스（民宿）｜地鐵廣安里步行約 20 分</p>
+</div>
+<div class="card"><h2>💡 使用方式</h2><p class="tip">出遊時以「行程」看當天安排；「踩點」可依地區與類別篩選，點勾選框記錄已去過的店家。勾選狀態只保存在目前瀏覽頁面中。</p></div>
+</section>
+</div>
+<script>
+const DATA = {"flights": [{"date": "10/08 (四)", "flight": "ZE984", "route": "TPE / PUS", "terminal": "T1", "time": "02:40 / 06:10", "cost": null}, {"date": "10/12 (一)", "flight": "ZE987", "route": "PUS / TPE", "terminal": "T1", "time": "22:25 / 00:15 (二)", "cost": null}], "hotel": {"period": "10/08 (四) - 10/12 (一)", "name": "플로트하우스 (民宿)", "station": "地鐵廣安里 步行20分", "cost": null}, "days": [{"day": "第一天", "date": "10/08 (四)\n廣安里", "items": ["06:10 落地，09:00-12:00 入進SPA LAND Centum City休息＆吃東西", "12:00-15:00 新世界百貨", "15:00 check 休息、梳洗", "16:00 Millac The Market 逛街", "18:30 晚餐 83獬豸", "22:00 移動去搭夜間遊艇 / 22:30 夜間遊艇"]}, {"day": "第二天", "date": "10/09 (五)\n海雲台", "items": ["10:00 海雲臺傳統市場", "", "13:00 到場排隊膠囊列車 (尾浦/青沙) 、13:30尾浦出發到青沙車次（單程，約30分鐘）", "14:30 青沙洞漫遊", "晚上TBC"]}, {"day": "第三天", "date": "10/10 (六)\n西面>田浦", "items": ["11:00出發 四面>田浦", "12:00午餐 松亭3代豬肉湯飯", "13:00-15:00 四面", "15:00-18:00 田浦/田浦咖啡街", "18:30 晚餐 WOOMINAM KOREAN BBQ", "21:00 回廣安里看無人機", "22:00 酒吧"]}, {"day": "第四天", "date": "10/11 (日)\n影島>松島>南浦洞", "items": ["09:00 出門、早餐，BIFF廣場", "10:00 影島大橋、AREA6、白淺灘文化村", "12:00 影島午餐", "13:00 松島：松島天空步道（起點處）> 海上纜車 > 松島龍宮空中步道 > 松島海岸散步路", "15:00 甘洞文化村：", "17:00 南浦洞：釜山最大、最新的OY", "19:00 晚餐"]}, {"day": "第五天", "date": "10/12 (一)\n醫美", "items": ["早上廣安里最後回味", "16:00 醫美 vs line 診所 釜山西面店", "18:00 集合前往機場"]}], "spots": [{"name": "파워스테이션", "note": "黑膠唱片行", "category": "選物/購物", "area": "四面/田浦"}, {"name": "송정3대국밥", "note": "松亭3代豬肉湯飯", "category": "餐廳", "area": "四面/田浦"}, {"name": "우미남 서면점", "note": "韓式烤肉", "category": "餐廳", "area": "四面/田浦"}, {"name": "핫트랙스 부산점", "note": "文具店", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Lasoop Rosters&Bakery", "note": "水簾洞咖啡廳", "category": "早午餐/咖啡廳", "area": "四面/田浦"}, {"name": "83獬豸 西面店", "note": "韓式烤肉", "category": "餐廳", "area": "四面/田浦"}, {"name": "경남수산", "note": "生魚片餐廳", "category": "餐廳", "area": "四面/田浦"}, {"name": "樂天百貨", "note": "樂天百貨", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Object Seomyeon", "note": "生活文創選物店", "category": "選物/購物", "area": "四面/田浦"}, {"name": "BRACKET TABLE", "note": "生活文創選物店＆餐具", "category": "選物/購物", "area": "四面/田浦"}, {"name": "AVIVERE Company select shop", "note": "生活文創選物店＆香氛", "category": "選物/購物", "area": "四面/田浦"}, {"name": "musinsa standard", "note": "服飾店", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Strut Coffee", "note": "田浦咖啡街", "category": "早午餐/咖啡廳", "area": "四面/田浦"}, {"name": "STATE", "note": "田浦咖啡街", "category": "早午餐/咖啡廳", "area": "四面/田浦"}, {"name": "Longdrivers", "note": "田浦咖啡街", "category": "早午餐/咖啡廳", "area": "四面/田浦"}, {"name": "파니에 panier", "note": "生活文創選物店", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Things of note (띵스오브노트)", "note": "生活文創選物店", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Made by 西面店 (메이드바이 서면)", "note": "生活文創選物店＆插畫", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Paper Garden (페이퍼가든)", "note": "生活文創選物店 自然系選物", "category": "選物/購物", "area": "四面/田浦"}, {"name": "Pot of busan", "note": "老屋咖啡廳", "category": "早午餐/咖啡廳", "area": "未分類"}, {"name": "Hertz Samo 헤르츠삼오 부산점", "note": "底片小店", "category": "選物/購物", "area": "未分類"}, {"name": "Diart 디아트커피라림", "note": "土耳其麵包", "category": "早午餐/咖啡廳", "area": "未分類"}, {"name": "Fruto Fruta", "note": "水果系咖啡廳", "category": "早午餐/咖啡廳", "area": "未分類"}, {"name": "李在模披薩 西面中央店", "note": "異國披薩", "category": "餐廳", "area": "未分類"}, {"name": "KT&G상상마당 부산", "note": "想像庭院", "category": "文藝", "area": "未分類"}, {"name": "AREA6", "note": "生活文創選物店", "category": "選物/購物", "area": "未分類"}, {"name": "Momos Yeongdo Roastery & Coffee bar", "note": "咖啡廳", "category": "其他", "area": "未分類"}, {"name": "P.ARK", "note": "複合式海景咖啡廳", "category": "其他", "area": "未分類"}, {"name": "影島海女村", "note": "海鮮店", "category": "其他", "area": "未分類"}, {"name": "BIFF廣場", "note": "市集", "category": "其他", "area": "未分類"}, {"name": "松島纜車", "note": "", "category": "其他", "area": "未分類"}, {"name": "Arte Museum Busan", "note": "沉浸式展覽館", "category": "其他", "area": "未分類"}, {"name": "Millac The Market", "note": "美式紅磚倉庫", "category": "選物/購物", "area": "廣安里"}, {"name": "83獬豸 廣安里店", "note": "韓式烤肉", "category": "餐廳", "area": "廣安里"}, {"name": "Dongmyeonsik Milmyeon", "note": "看海吃冷麵", "category": "餐廳", "area": "廣安里"}, {"name": "Nasari Sigdang", "note": "韓式道地料理", "category": "餐廳", "area": "廣安里"}, {"name": "workingholiday busan", "note": "海景下午茶", "category": "早午餐/咖啡廳", "area": "廣安里"}, {"name": "All Sunday", "note": "必吃貝果店", "category": "早午餐/咖啡廳", "area": "廣安里"}, {"name": "카페 오뜨 Cafe Haute", "note": "海景下午茶", "category": "早午餐/咖啡廳", "area": "廣安里"}, {"name": "Casa Busano Gwangan Branch", "note": "海景下午茶", "category": "早午餐/咖啡廳", "area": "廣安里"}, {"name": "Salmon Brothers", "note": "義式料理", "category": "餐廳", "area": "廣安里"}, {"name": "SCENTICA Gwangan", "note": "文青小眾香氛店", "category": "選物/購物", "area": "廣安里"}, {"name": "Duplit Stylish Café in Gwangalli", "note": "義式下午茶＆餐酒", "category": "餐廳", "area": "廣安里"}, {"name": "이낙에산다 광안리본점", "note": "辣章魚", "category": "餐廳", "area": "廣安里"}]};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+function init(){
+  // tabs
+  $$('.nav button').forEach(b=>b.addEventListener('click',()=>{
+    $$('.nav button').forEach(x=>x.classList.remove('active'));
+    $$('.section').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); $('#'+b.dataset.tab).classList.add('active');
+  }));
+
+  // day tabs
+  const dt=$('#dayTabs');
+  DATA.days.forEach((d,i)=>{
+    const b=document.createElement('button'); b.textContent=d.day.replace('第一天','D1').replace('第二天','D2').replace('第三天','D3').replace('第四天','D4').replace('第五天','D5');
+    b.dataset.i=i; if(i===0)b.classList.add('active'); dt.appendChild(b);
+  });
+  dt.addEventListener('click',e=>{if(e.target.tagName==='BUTTON'){ $$('#dayTabs button').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');renderDay(+e.target.dataset.i)}});
+
+  // filters
+  const areas=[...new Set(DATA.spots.map(x=>x.area).filter(Boolean))].sort();
+  const cats=[...new Set(DATA.spots.map(x=>x.category).filter(Boolean))].sort();
+  areas.forEach(x=>$('#areaFilter').add(new Option(x,x)));
+  cats.forEach(x=>$('#catFilter').add(new Option(x,x)));
+  ['areaFilter','catFilter','spotSearch'].forEach(id=>$( '#'+id).addEventListener('input',renderSpots));
+
+  renderDay(0); renderSpots();
+  $('#flights').innerHTML=DATA.flights.map(f=>`<div class="flight"><div class="badge">${f.date}</div><div><b>${f.flight}</b><div class="muted">${f.route}｜${f.terminal}</div><div>${f.time}</div></div></div>`).join('');
+  $('#hotelName').textContent=DATA.hotel.name||'-'; $('#hotelPeriod').textContent=DATA.hotel.period||'-'; $('#hotelStation').textContent=DATA.hotel.station||'-';
+  updateCountdown(); setInterval(updateCountdown,60000);
+}
+function renderDay(i){
+  const d=DATA.days[i];
+  $('#dayContent').innerHTML=`<div style="margin-top:12px"><b>${d.date.replace('\\n','｜')}</b></div><div class="timeline">${d.items.map(x=>{
+    const m=x.match(/^(\\d{1,2}:\\d{2})\\s*(.*)$/);
+    return `<div class="item"><div class="dot"></div><div><strong>${m?m[1]+'　'+m[2]:x}</strong></div></div>`;
+  }).join('')}</div>`;
+}
+function renderSpots(){
+  const a=$('#areaFilter').value,c=$('#catFilter').value,q=$('#spotSearch').value.trim().toLowerCase();
+  const rows=DATA.spots.filter(x=>(!a||x.area===a)&&(!c||x.category===c)&&(!q||(x.name+' '+x.note).toLowerCase().includes(q)));
+  $('#spotList').innerHTML=`<div class="muted" style="padding:12px 0">${rows.length} 個踩點</div>`+rows.map((x,i)=>{
+    const id='s'+DATA.spots.indexOf(x);
+    return `<label class="spot"><input type="checkbox" id="${id}" data-name="${escapeHtml(x.name)}"><div class="spot-main"><div class="spot-name" data-target="${id}">${escapeHtml(x.name)}</div><div class="muted">${escapeHtml(x.note)}</div><span class="tag">${escapeHtml(x.category)}</span>${x.area?`<span class="tag">${escapeHtml(x.area)}</span>`:''}</div></label>`;
+  }).join('');
+  $('#spotList').querySelectorAll('input').forEach(cb=>cb.addEventListener('change',()=>{
+    cb.closest('.spot').querySelector('.spot-name').classList.toggle('done',cb.checked);
+  }));
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function updateCountdown(){
+  const target=new Date('2026-10-08T06:10:00+09:00'), now=new Date(), ms=target-now;
+  if(ms<=0){$('#countdown').textContent='旅程進行中 ✈️';return}
+  const d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000);
+  $('#countdown').textContent=`距離釜山第一站：${d} 天 ${h} 小時 ${m} 分`;
+}
+init();
+</script>
+</body>
+</html>
